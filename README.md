@@ -30,7 +30,7 @@ Deploying code...
 
 Full example [here](_examples/task/main.go).
 
-### Prompting for input with 'prompt'
+### Prompting for input with `prompt`
 
 The `prompt` package provides various methods of gathering user input.
 
