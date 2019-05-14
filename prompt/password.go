@@ -9,6 +9,7 @@ import (
 	"github.com/liamg/tml"
 )
 
+// EnterPassword requests input from the user with the given message, hiding that input, and returns any user input that was gathered until a newline was entered
 func EnterPassword(msg string) string {
 
 	terminal.ClearLine()

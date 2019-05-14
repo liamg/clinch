@@ -7,6 +7,7 @@ import (
 	"github.com/liamg/clinch/terminal"
 )
 
+// EnterInput requests input from the user with the given message, and returns any user input that was gathered until a newline was entered
 func EnterInput(msg string) string {
 	terminal.ClearLine()
 	terminal.PrintImportantf(msg)

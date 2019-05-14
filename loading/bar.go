@@ -14,10 +14,12 @@ type Bar struct {
 	complete bool
 }
 
+// NewBar creates a new loading bar
 func NewBar() *Bar {
 	return &Bar{}
 }
 
+// SetPercent sets the current percentage completion of the bar, and renders it to the current line
 func (bar *Bar) SetPercent(percent float64) {
 
 	bar.lock.Lock()
@@ -53,6 +55,7 @@ func (bar *Bar) SetPercent(percent float64) {
 	fmt.Printf(" %d%%", int(percent))
 }
 
+// Log logs a messages to the terminal without disrupting the rendered loading bar
 func (bar *Bar) Log(msg string) {
 	bar.lock.Lock()
 	defer bar.lock.Unlock()
@@ -60,6 +63,7 @@ func (bar *Bar) Log(msg string) {
 	fmt.Println(msg)
 }
 
+// Close hides the loading bar and tidies up
 func (bar *Bar) Close() {
 	bar.lock.Lock()
 	defer bar.lock.Unlock()

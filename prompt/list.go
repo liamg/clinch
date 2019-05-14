@@ -7,9 +7,13 @@ import (
 	"github.com/liamg/tml"
 )
 
+// ErrUserCancelled means the user cancelled the current action
 var ErrUserCancelled = fmt.Errorf("User cancelled")
-var ErrUserChoiceInvalid = fmt.Errorf("User cancelled")
 
+// ErrUserChoiceInvalid means the user chose an option which was not valid
+var ErrUserChoiceInvalid = fmt.Errorf("User choice invalid")
+
+// ChooseFromList prompts the user to select an item from a list. It return the chosen list index, the chosen list item value, or an error
 func ChooseFromList(message string, options []string) (int, string, error) {
 	fmt.Printf("\n %s\n\n", message)
 	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
@@ -43,7 +47,7 @@ func ChooseFromList(message string, options []string) (int, string, error) {
 
 	choiceIndex, err := strconv.Atoi(choice)
 	if err != nil || choiceIndex-1 >= len(options) || choiceIndex <= 0 {
-		return -1, "", ErrUserCancelled
+		return -1, "", ErrUserChoiceInvalid
 	}
 
 	return choiceIndex - 1, options[choiceIndex-1], nil

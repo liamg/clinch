@@ -14,6 +14,7 @@ type Task struct {
 	description string
 }
 
+// New creates a new task
 func New(category string, description string, f func() error) *Task {
 	return &Task{
 		function:    f,
@@ -22,6 +23,7 @@ func New(category string, description string, f func() error) *Task {
 	}
 }
 
+// Run runs the task, providing animated output as it does so. If the task fails, the error from the task function will be returned here.
 func (t *Task) Run() error {
 	terminal.HideCursor()
 	defer terminal.ShowCursor()
