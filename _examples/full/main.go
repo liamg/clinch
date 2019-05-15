@@ -29,7 +29,7 @@ func main() {
 	if err := task.New(
 		"build",
 		"compiling...",
-		func() error {
+		func(t *task.Task) error {
 			time.Sleep(time.Second * 3)
 			return nil
 		},
@@ -42,7 +42,7 @@ func main() {
 		if err := task.New(
 			"test",
 			fmt.Sprintf("running test #%d...", i),
-			func() error {
+			func(t *task.Task) error {
 				time.Sleep(time.Second * time.Duration(rand.Intn(3)))
 				return nil
 			},
@@ -54,7 +54,7 @@ func main() {
 	if err := task.New(
 		"release",
 		"packaging...",
-		func() error {
+		func(t *task.Task) error {
 			time.Sleep(time.Second * 3)
 			return nil
 		},
@@ -65,7 +65,7 @@ func main() {
 	if err := task.New(
 		"release",
 		"uploading...",
-		func() error {
+		func(t *task.Task) error {
 			time.Sleep(time.Second * 3)
 			return nil
 		},

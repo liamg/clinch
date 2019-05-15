@@ -9,18 +9,33 @@ import (
 )
 
 type Task struct {
-	function    func() error
-	category    string
-	description string
+	function          func(t *Task) error
+	category          string
+	description       string
+	animationStopped  bool
+	stopAnimationChan chan struct{}
+	skipped           bool
 }
 
 // New creates a new task
-func New(category string, description string, f func() error) *Task {
+func New(category string, description string, f func(t *Task) error) *Task {
 	return &Task{
 		function:    f,
 		category:    category,
 		description: description,
 	}
+}
+
+func (t *Task) Skip() {
+	t.skipped = true
+}
+
+func (t *Task) StopAnimation() {
+	if t.animationStopped {
+		return
+	}
+	t.animationStopped = true
+	t.stopAnimationChan <- struct{}{}
 }
 
 // Run runs the task, providing animated output as it does so. If the task fails, the error from the task function will be returned here.
@@ -31,7 +46,7 @@ func (t *Task) Run() error {
 	tml.Printf("<lightblue>% 10s</lightblue> %s", t.category, t.description)
 	terminal.MoveCursorToColumn(74)
 	tml.Printf("<bold><darkgrey>[    ]</darkgrey></bold>")
-	stopAnimationChan := make(chan struct{})
+	t.stopAnimationChan = make(chan struct{})
 	go func() {
 
 		ticker := time.NewTicker(time.Millisecond * 250)
@@ -52,7 +67,7 @@ func (t *Task) Run() error {
 
 		for {
 			select {
-			case <-stopAnimationChan:
+			case <-t.stopAnimationChan:
 				return
 			case <-ticker.C:
 				frame := frames[(frameIndex)%len(frames)]
@@ -65,11 +80,13 @@ func (t *Task) Run() error {
 			}
 		}
 	}()
-	err := t.function()
-	stopAnimationChan <- struct{}{}
+	err := t.function(t)
+	t.StopAnimation()
 	terminal.MoveCursorToColumn(75)
 	if err != nil {
 		tml.Printf("<red><bold>FAIL</bold></red>")
+	} else if t.skipped {
+		tml.Printf("<yellow><bold>SKIP</bold></yellow>")
 	} else {
 		tml.Printf("<green><bold> OK </bold></green>")
 	}
