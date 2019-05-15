@@ -2,7 +2,6 @@ package prompt
 
 import (
 	"syscall"
-	"fmt"
 
 	"github.com/liamg/clinch/terminal"
 	sshterm "golang.org/x/crypto/ssh/terminal"
@@ -16,6 +15,5 @@ func EnterPassword(msg string) string {
 	if err != nil {
 		return ""
 	}
-	fmt.Printf("\n")
 	return string(bytePassword)
 }
