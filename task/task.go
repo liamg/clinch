@@ -38,14 +38,18 @@ func (t *Task) StopAnimation() {
 	t.stopAnimationChan <- struct{}{}
 }
 
-// Run runs the task, providing animated output as it does so. If the task fails, the error from the task function will be returned here.
-func (t *Task) Run() error {
-	terminal.HideCursor()
-	defer terminal.ShowCursor()
+func (t *Task) printSkeleton() {
 	terminal.ClearLine()
 	tml.Printf("<lightblue>% 10s</lightblue> %s", t.category, t.description)
 	terminal.MoveCursorToColumn(74)
 	tml.Printf("<bold><darkgrey>[    ]</darkgrey></bold>")
+}
+
+// Run runs the task, providing animated output as it does so. If the task fails, the error from the task function will be returned here.
+func (t *Task) Run() error {
+	terminal.HideCursor()
+	defer terminal.ShowCursor()
+	t.printSkeleton()
 	t.stopAnimationChan = make(chan struct{})
 	go func() {
 
@@ -82,6 +86,7 @@ func (t *Task) Run() error {
 	}()
 	err := t.function(t)
 	t.StopAnimation()
+	t.printSkeleton()
 	terminal.MoveCursorToColumn(75)
 	if err != nil {
 		tml.Printf("<red><bold>FAIL</bold></red>")
