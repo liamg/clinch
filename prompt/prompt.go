@@ -22,3 +22,12 @@ func EnterInput(msg string) string {
 	}
 	return s
 }
+
+// EnterInputWithDefault requests input from the user with the given message and returns a default if the input is empty
+func EnterInputWithDefault(msg, defaultValue string) string {
+	input := EnterInput(msg)
+	if len(input) == 0 {
+		input = defaultValue
+	}
+	return input
+}

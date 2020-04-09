@@ -9,4 +9,7 @@ import (
 func main() {
 	input := prompt.EnterInput("Enter your name: ")
 	fmt.Printf("You entered '%s'\n", input)
+
+	searchEngineUrl := prompt.EnterInputWithDefault("Set search engine url [https://www.google.com?q=]: ", "https://www.google.com?q=")
+	fmt.Printf("Search engine URL set to '%s'\n", searchEngineUrl)
 }
