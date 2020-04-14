@@ -2,6 +2,7 @@ package prompt
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 
 	"github.com/liamg/clinch/terminal"
@@ -21,4 +22,13 @@ func EnterInput(msg string) string {
 		s = input[:len(input)-1]
 	}
 	return s
+}
+
+// EnterInputWithDefault requests input from the user with the given message and returns a default if the input is empty
+func EnterInputWithDefault(msg, defaultValue string) string {
+	input := EnterInput(fmt.Sprintf("%v [%v]: ", msg, defaultValue))
+	if len(input) == 0 {
+		input = defaultValue
+	}
+	return input
 }
