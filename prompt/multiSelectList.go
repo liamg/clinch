@@ -9,9 +9,10 @@ import (
 
 const (
 	SPACE  = 32
-	UP     = 38
-	DOWN   = 40
+	UP     = 65
+	DOWN   = 66
 	ESCAPE = 27
+	RETURN = 13
 )
 
 type listItem struct {
@@ -69,7 +70,7 @@ keyInput:
 		case ESCAPE:
 			terminal.MoveCursorDown(len(items) - currentPos + 1)
 			return []int{}, []string{}, ErrUserCancelled
-		default:
+		case RETURN:
 			break keyInput
 		}
 	}
@@ -119,18 +120,23 @@ func getKeyInput() (keyCode int, err error) {
 		return
 	}
 	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
-		if bytes[2] == 65 {
+		if bytes[2] == UP {
 			keyCode = UP
-		} else if bytes[2] == 66 {
+		} else if bytes[2] == DOWN {
 			keyCode = DOWN
 		}
 	} else if numRead == 1 {
-		if bytes[0] == 27 {
+		switch bytes[0] {
+		case ESCAPE:
 			keyCode = ESCAPE
-		}
-		if int(bytes[0]) == ' ' {
+		case RETURN:
+			keyCode = RETURN
+		case SPACE:
 			keyCode = SPACE
 		}
+		//if int(bytes[0]) == ' ' {
+		//	keyCode = SPACE
+		//}
 	} else {
 		print(int(bytes[2]))
 	}
