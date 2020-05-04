@@ -13,6 +13,9 @@ const (
 	DOWN   = 66
 	ESCAPE = 27
 	RETURN = 13
+
+	ROW_OFFSET     = 2
+	DEFAULT_COLUMN = 0
 )
 
 type listItem struct {
@@ -43,8 +46,6 @@ func ChooseFromMultiList(message string, options []string) ([]int, []string, err
 func getListSelection(message string, items []*listItem) ([]int, []string, error) {
 	fmt.Printf("\n %s\n\n", message)
 	currentPos := 0
-	fmt.Println(" Press escape to cancel, space to toggle, return to accept.")
-	fmt.Println("")
 	drawItems(items, currentPos, false)
 
 keyInput:
@@ -68,13 +69,13 @@ keyInput:
 			items[currentPos].selected = !items[currentPos].selected
 			drawItems(items, currentPos, true)
 		case ESCAPE:
-			terminal.MoveCursorDown(len(items) - currentPos + 1)
+			resetPrompt(len(items) - currentPos)
 			return []int{}, []string{}, ErrUserCancelled
 		case RETURN:
 			break keyInput
 		}
 	}
-	terminal.MoveCursorDown(len(items) - currentPos + 1)
+	resetPrompt(len(items) - currentPos)
 
 	var selectedIndexes []int
 	var selectedValues []string
@@ -89,6 +90,12 @@ keyInput:
 	return selectedIndexes, selectedValues, nil
 }
 
+func resetPrompt(rowPosition int) {
+	terminal.MoveCursorDown(rowPosition + ROW_OFFSET - 1)
+	terminal.ClearLine()
+	terminal.MoveCursorToColumn(DEFAULT_COLUMN)
+}
+
 func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 	if isRedraw {
 		terminal.MoveCursorUp(currentPos)
@@ -99,7 +106,8 @@ func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 		_ = tml.Printf(item.toString())
 	}
 	fmt.Println("")
-	terminal.MoveCursorUp(len(items) + 1 - currentPos)
+	fmt.Println(" space to toggle, return to accept. (Esc to cancel): ")
+	terminal.MoveCursorUp(len(items) - currentPos + ROW_OFFSET)
 	terminal.MoveCursorToColumn(1)
 }
 
@@ -120,25 +128,15 @@ func getKeyInput() (keyCode int, err error) {
 		return
 	}
 	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
-		if bytes[2] == UP {
-			keyCode = UP
-		} else if bytes[2] == DOWN {
-			keyCode = DOWN
+		switch bytes[2] {
+		case UP, DOWN:
+			keyCode = int(bytes[2])
 		}
 	} else if numRead == 1 {
 		switch bytes[0] {
-		case ESCAPE:
-			keyCode = ESCAPE
-		case RETURN:
-			keyCode = RETURN
-		case SPACE:
-			keyCode = SPACE
+		case ESCAPE, RETURN, SPACE:
+			keyCode = int(bytes[0])
 		}
-		//if int(bytes[0]) == ' ' {
-		//	keyCode = SPACE
-		//}
-	} else {
-		print(int(bytes[2]))
 	}
 	t.Restore()
 	t.Close()

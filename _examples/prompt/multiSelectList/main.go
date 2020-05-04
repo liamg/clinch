@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/liamg/clinch/prompt"
+	"strings"
 )
 
 func main() {
@@ -18,11 +17,14 @@ func main() {
 		"grapefruit",
 	}
 
-	_, selected, err := prompt.ChooseFromMultiList("Choose a fruit for the salad!", options)
-	if err != nil   {
-		println(err.Error())
+	_, selected, err := prompt.ChooseFromMultiList("Choose the fruit for the salad!", options)
+	if err != nil {
+		fmt.Printf("%v\n",err.Error())
 		return
 	}
-
-	fmt.Printf("The salad will contain delicious %s!\n", strings.Join(selected, ", "))
+	if len(selected) == 0 {
+		fmt.Println("That will be a boring fruit salad!!")
+	} else {
+		fmt.Printf("The salad will contain delicious %s!\n", strings.Join(selected, ", "))
+	}
 }
