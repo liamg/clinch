@@ -52,7 +52,7 @@ keyInput:
 	for {
 		keyCode, err := getKeyInput()
 		if err != nil {
-			panic(err)
+			return nil, nil, err
 		}
 		switch keyCode {
 		case DOWN:
@@ -114,18 +114,18 @@ func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 func getKeyInput() (keyCode int, err error) {
 	t, err := term.Open("/dev/tty")
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 	err = term.RawMode(t)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 	bytes := make([]byte, 3)
 
 	var numRead int
 	numRead, err = t.Read(bytes)
 	if err != nil {
-		return
+		return 0, err
 	}
 	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
 		switch bytes[2] {
