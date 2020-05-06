@@ -41,6 +41,7 @@ Full examples are available in [_examples/prompt](_examples/prompt):
 - [Text input](_examples/prompt/input/main.go)
 - [Password input](_examples/prompt/password/main.go)
 - [Selection from a list](_examples/prompt/list/main.go)
+- [Multi Selection from a list](_examples/prompt/multiSelectList/main.go) [(mutli list in action)](multilist.gif)
 
 ### More granular control with `terminal`
 
