@@ -25,6 +25,8 @@ type listItem struct {
 	colour   string
 }
 
+var ErrNoOptionsProvided = fmt.Errorf("no options were provided")
+
 func (item *listItem) toString() string {
 	check := " "
 	if item.selected {
@@ -34,6 +36,9 @@ func (item *listItem) toString() string {
 }
 
 func ChooseFromMultiList(message string, options []string) ([]int, []string, error) {
+	if len(options) == 0 {
+		return nil, nil, ErrNoOptionsProvided
+	}
 	var items []*listItem
 	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
 	for index, option := range options {
