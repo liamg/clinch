@@ -106,8 +106,8 @@ func resetPrompt(rowPosition int) {
 func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 	if isRedraw {
 		terminal.MoveCursorUp(currentPos)
-		terminal.MoveCursorToColumn(-2)
 	}
+	fmt.Print("\r")
 
 	for _, item := range items {
 		_ = tml.Printf(item.toString())
