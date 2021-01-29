@@ -2,14 +2,19 @@ package prompt
 
 import (
 	"fmt"
-	"sort"
-
 	"github.com/liamg/clinch/terminal"
-	"github.com/liamg/keyboard"
 	"github.com/liamg/tml"
+	"github.com/pkg/term"
+	"sort"
 )
 
 const (
+	SPACE  = 32
+	UP     = 65
+	DOWN   = 66
+	ESCAPE = 27
+	RETURN = 13
+
 	ROW_OFFSET     = 2
 	DEFAULT_COLUMN = 0
 )
@@ -50,37 +55,30 @@ func getListSelection(message string, items []*listItem) ([]int, []string, error
 	currentPos := 0
 	drawItems(items, currentPos, false)
 
-	if err := keyboard.Open(); err != nil {
-		return nil, nil, err
-	}
-	defer func() {
-		_ = keyboard.Close()
-	}()
-
 keyInput:
 	for {
-		_, keyCode, err := keyboard.GetSingleKey()
+		keyCode, err := getKeyInput()
 		if err != nil {
 			return nil, nil, err
 		}
 		switch keyCode {
-		case keyboard.KeyArrowDown:
+		case DOWN:
 			if currentPos < len(items)-1 {
 				terminal.MoveCursorDown(1)
 				currentPos += 1
 			}
-		case keyboard.KeyArrowUp:
+		case UP:
 			if currentPos > 0 {
 				terminal.MoveCursorUp(1)
 				currentPos -= 1
 			}
-		case keyboard.KeySpace:
+		case SPACE:
 			items[currentPos].selected = !items[currentPos].selected
 			drawItems(items, currentPos, true)
-		case keyboard.KeyEsc:
+		case ESCAPE:
 			resetPrompt(len(items) - currentPos)
 			return []int{}, []string{}, ErrUserCancelled
-		case keyboard.KeyEnter:
+		case RETURN:
 			break keyInput
 		}
 	}
@@ -118,4 +116,36 @@ func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 	fmt.Println(" space to toggle, return to accept. (Esc to cancel): ")
 	terminal.MoveCursorUp(len(items) - currentPos + ROW_OFFSET)
 	terminal.MoveCursorToColumn(1)
+}
+
+func getKeyInput() (keyCode int, err error) {
+	t, err := term.Open("/dev/tty")
+	if err != nil {
+		return 0, err
+	}
+	err = term.RawMode(t)
+	if err != nil {
+		return 0, err
+	}
+	bytes := make([]byte, 3)
+
+	var numRead int
+	numRead, err = t.Read(bytes)
+	if err != nil {
+		return 0, err
+	}
+	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
+		switch bytes[2] {
+		case UP, DOWN:
+			keyCode = int(bytes[2])
+		}
+	} else if numRead == 1 {
+		switch bytes[0] {
+		case ESCAPE, RETURN, SPACE:
+			keyCode = int(bytes[0])
+		}
+	}
+	t.Restore()
+	t.Close()
+	return
 }
