@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/liamg/clinch/terminal"
@@ -51,9 +52,12 @@ func (t *Task) Run() error {
 	defer terminal.ShowCursor()
 	t.printSkeleton()
 	t.stopAnimationChan = make(chan struct{})
+	wait := sync.WaitGroup{}
+	wait.Add(1)
 	go func() {
 
 		ticker := time.NewTicker(time.Millisecond * 250)
+		defer wait.Done()
 		defer ticker.Stop()
 
 		frameIndex := 0
@@ -86,6 +90,7 @@ func (t *Task) Run() error {
 	}()
 	err := t.function(t)
 	t.StopAnimation()
+	wait.Wait()
 	t.printSkeleton()
 	terminal.MoveCursorToColumn(75)
 	if err != nil {
