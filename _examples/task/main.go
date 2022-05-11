@@ -59,5 +59,18 @@ func main() {
 		fmt.Printf("Error: %s\n", err)
 	}
 
+	if err := task.New(
+		"notify",
+		"sending...",
+		func(t *task.Task) error {
+			fmt.Println("")
+			fmt.Println("Inside a task with output disabled")
+			return nil
+		},
+		task.WithNoOutput(),
+	).Run(); err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+
 	fmt.Println("")
 }
