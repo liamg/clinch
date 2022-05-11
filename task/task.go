@@ -16,15 +16,30 @@ type Task struct {
 	animationStopped  bool
 	stopAnimationChan chan struct{}
 	skipped           bool
+	noOutput          bool
 }
 
-// New creates a new task
-func New(category string, description string, f func(t *Task) error) *Task {
-	return &Task{
+type Option func(*Task)
+
+func WithNoOutput() Option {
+	return func(t *Task) {
+		t.noOutput = true
+	}
+}
+
+// New creates a new task.
+func New(category string, description string, f func(t *Task) error, opts ...Option) *Task {
+	t := &Task{
 		function:    f,
 		category:    category,
 		description: description,
 	}
+
+	for _, opt := range opts {
+		opt(t)
+	}
+
+	return t
 }
 
 func (t *Task) Skip() {
@@ -48,6 +63,10 @@ func (t *Task) printSkeleton() {
 
 // Run runs the task, providing animated output as it does so. If the task fails, the error from the task function will be returned here.
 func (t *Task) Run() error {
+	if t.noOutput {
+		return t.function(t)
+	}
+
 	terminal.HideCursor()
 	defer terminal.ShowCursor()
 	t.printSkeleton()
