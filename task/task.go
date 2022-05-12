@@ -47,6 +47,9 @@ func (t *Task) Skip() {
 }
 
 func (t *Task) StopAnimation() {
+	if t.noOutput {
+		return
+	}
 	if t.animationStopped {
 		return
 	}
