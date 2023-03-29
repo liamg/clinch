@@ -2,10 +2,11 @@ package prompt
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/liamg/clinch/terminal"
 	"github.com/liamg/tml"
 	"github.com/pkg/term"
-	"sort"
 )
 
 const (
@@ -36,13 +37,16 @@ func (item *listItem) toString() string {
 	return fmt.Sprintf(" <darkgrey>[</darkgrey>%v<darkgrey>]</darkgrey> <%s>%v\n\r", check, item.colour, item.value)
 }
 
-func ChooseFromMultiList(message string, options []string) ([]int, []string, error) {
+func ChooseFromMultiList(message string, options []string, colourOverrides ...string) ([]int, []string, error) {
 	if len(options) == 0 {
 		return nil, nil, ErrNoOptionsProvided
 	}
 	sort.Strings(options)
 	var items []*listItem
 	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
+	if len(colourOverrides) > 0 {
+		colours = colourOverrides
+	}
 	for index, option := range options {
 		col := colours[index%len(colours)]
 		items = append(items, &listItem{index: index, value: option, colour: col})

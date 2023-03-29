@@ -14,9 +14,12 @@ var ErrUserCancelled = fmt.Errorf("User cancelled")
 var ErrUserChoiceInvalid = fmt.Errorf("User choice invalid")
 
 // ChooseFromList prompts the user to select an item from a list. It return the chosen list index, the chosen list item value, or an error
-func ChooseFromList(message string, options []string) (int, string, error) {
+func ChooseFromList(message string, options []string, colourOverrides ...string) (int, string, error) {
 	fmt.Printf("\n %s\n\n", message)
 	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
+	if len(colourOverrides) > 0 {
+		colours = colourOverrides
+	}
 
 	for i, option := range options {
 		col := colours[i%len(colours)]
