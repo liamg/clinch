@@ -41,7 +41,6 @@ func ChooseFromMultiList(message string, options []string, colourOverrides ...st
 	if len(options) == 0 {
 		return nil, nil, ErrNoOptionsProvided
 	}
-	sort.Strings(options)
 	var items []*listItem
 	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
 	if len(colourOverrides) > 0 {
