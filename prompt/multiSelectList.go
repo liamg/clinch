@@ -2,7 +2,6 @@ package prompt
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/liamg/clinch/terminal"
 	"github.com/liamg/tml"
