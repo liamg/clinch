@@ -14,6 +14,8 @@ const (
 	DOWN   = 66
 	ESCAPE = 27
 	RETURN = 13
+	A      = 97
+	U      = 117
 
 	ROW_OFFSET     = 2
 	DEFAULT_COLUMN = 0
@@ -52,22 +54,6 @@ func ChooseFromMultiList(message string, options []string, colourOverrides ...st
 	return getListSelection(message, items)
 }
 
-func ChooseFromPreselectedMultiList(message string, options []string, colourOverrides ...string) ([]int, []string, error) {
-	if len(options) == 0 {
-		return nil, nil, ErrNoOptionsProvided
-	}
-	var items []*listItem
-	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
-	if len(colourOverrides) > 0 {
-		colours = colourOverrides
-	}
-	for index, option := range options {
-		col := colours[index%len(colours)]
-		items = append(items, &listItem{index: index, value: option, selected: true, colour: col})
-	}
-	return getListSelection(message, items)
-}
-
 func getListSelection(message string, items []*listItem) ([]int, []string, error) {
 	fmt.Printf("\n %s\n\r", message)
 	currentPos := 0
@@ -90,6 +76,17 @@ keyInput:
 				terminal.MoveCursorUp(1)
 				currentPos -= 1
 			}
+		case A:
+			for _, item := range items {
+				item.selected = true
+			}
+			drawItems(items, currentPos, true)
+		case U:
+			for _, item := range items {
+				item.selected = false
+			}
+			drawItems(items, currentPos, true)
+
 		case SPACE:
 			items[currentPos].selected = !items[currentPos].selected
 			drawItems(items, currentPos, true)
@@ -131,7 +128,7 @@ func drawItems(items []*listItem, currentPos int, isRedraw bool) {
 		_ = tml.Printf(item.toString())
 	}
 	fmt.Println("")
-	fmt.Println(" space to toggle, return to accept. (Esc to cancel): ")
+	fmt.Println(" space to toggle, return to accept. A/U select/unselect all (Esc to cancel): ")
 	terminal.MoveCursorUp(len(items) - currentPos + ROW_OFFSET)
 	terminal.MoveCursorToColumn(1)
 }
@@ -159,7 +156,7 @@ func getKeyInput() (keyCode int, err error) {
 		}
 	} else if numRead == 1 {
 		switch bytes[0] {
-		case ESCAPE, RETURN, SPACE:
+		case ESCAPE, RETURN, SPACE, A, U:
 			keyCode = int(bytes[0])
 		}
 	}
