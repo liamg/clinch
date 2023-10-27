@@ -52,6 +52,22 @@ func ChooseFromMultiList(message string, options []string, colourOverrides ...st
 	return getListSelection(message, items)
 }
 
+func ChooseFromPreselectedMultiList(message string, options []string, colourOverrides ...string) ([]int, []string, error) {
+	if len(options) == 0 {
+		return nil, nil, ErrNoOptionsProvided
+	}
+	var items []*listItem
+	colours := []string{"lightblue", "lightgreen", "lightyellow", "white"}
+	if len(colourOverrides) > 0 {
+		colours = colourOverrides
+	}
+	for index, option := range options {
+		col := colours[index%len(colours)]
+		items = append(items, &listItem{index: index, value: option, selected: true, colour: col})
+	}
+	return getListSelection(message, items)
+}
+
 func getListSelection(message string, items []*listItem) ([]int, []string, error) {
 	fmt.Printf("\n %s\n\r", message)
 	currentPos := 0
